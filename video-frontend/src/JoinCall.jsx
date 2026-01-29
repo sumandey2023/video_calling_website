@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { joinCall as apiJoinCall } from "./api";
 
 function JoinCall({ setCallData }) {
   const [username, setUsername] = useState("");
@@ -14,17 +15,7 @@ function JoinCall({ setCallData }) {
     }
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/join-call", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: username.trim(),
-          callId: callId.trim(),
-        }),
-      });
-
-      if (!res.ok) throw new Error("Join failed");
-      const data = await res.json();
+      const data = await apiJoinCall(username.trim(), callId.trim());
       setCallData(data);
     } catch (e) {
       console.error(e);
@@ -38,16 +29,20 @@ function JoinCall({ setCallData }) {
     <div>
       <h2>Join Call</h2>
       <input
+        type="text"
         placeholder="Enter your name"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         onKeyPress={(e) => e.key === "Enter" && !loading && joinCall()}
+        disabled={loading}
       />
       <input
+        type="text"
         placeholder="Enter Call ID (from creator)"
         value={callId}
         onChange={(e) => setCallId(e.target.value)}
         onKeyPress={(e) => e.key === "Enter" && !loading && joinCall()}
+        disabled={loading}
       />
       <button onClick={joinCall} disabled={loading}>
         {loading ? "⏳ Joining..." : "👥 Join Call"}
